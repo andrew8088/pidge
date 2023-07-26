@@ -2,6 +2,7 @@
   "name": "pidge",
   "version": "0.1.0",
   "dependencies": {
+    "@octokit/rest": "^20.0.1",
     "@types/node": "20.4.5",
     "@vercel/node": "^2.15.6",
     "eslint": "8.45.0",
