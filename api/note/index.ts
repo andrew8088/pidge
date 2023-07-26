@@ -1,11 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Octokit } from "@octokit/rest";
 
-const PIDGE_TOKEN = process.env.PIDGE_TOKEN;
-invariant(PIDGE_TOKEN, "Must set a PIDGE_TOKEN");
-
 const ORG = "andrew8088";
 const REPO = "shaky.sh";
+const PIDGE_TOKEN = process.env.PIDGE_TOKEN;
 
 module.exports = async function handler(
   req: VercelRequest,
@@ -14,6 +12,7 @@ module.exports = async function handler(
   try {
     const { pidgeToken, githubToken, note, dryRun } = req.body;
 
+    invariant(PIDGE_TOKEN, "Must set a PIDGE_TOKEN");
     invariant(pidgeToken, "body must include `pidgeToken`");
     invariant(pidgeToken === PIDGE_TOKEN, "incorrect pidgeToken provided");
     invariant(githubToken, "body must include `githubToken`");
