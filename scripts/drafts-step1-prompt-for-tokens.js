@@ -15,6 +15,7 @@ const obj = {
     pidgeToken,
     githubToken,
     note: {
+      name: getDatedNoteName(),
       text: draft.content,
     },
   },
@@ -29,4 +30,22 @@ if (response.statusCode != 200 && response.statusCode != 202) {
   context.fail();
 } else {
   console.log("res: " + JSON.stringify(response.responseData, null, "  "));
+}
+
+function pad(num) {
+  return num.toString().padStart(2, "0");
+}
+
+function getDatedNoteName() {
+  const now = new Date();
+  return (
+    [
+      now.getFullYear(),
+      pad(now.getMonth() + 1),
+      pad(now.getDate()),
+      pad(now.getHours()),
+      pad(now.getMinutes()),
+      pad(now.getSeconds()),
+    ].join("-") + ".md"
+  );
 }

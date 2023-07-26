@@ -22,6 +22,9 @@ module.exports = async function handler(
       console.log(
         `dry run: ${JSON.stringify({ pidgeToken, githubToken, note })}`
       );
+      console.log("--------TEXT-----------");
+      console.log(note.text);
+      console.log("-----------------------");
       res.status(200).json({ pidgeToken, githubToken, note });
       return;
     }
