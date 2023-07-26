@@ -18,7 +18,10 @@ module.exports = async function handler(
     invariant(githubToken, "body must include `githubToken`");
     invariant(note && note.text, "body must include `note.text`");
 
-    if (dryRun && dryRun === "true") {
+    if (dryRun && (dryRun === "true" || dryRun === true)) {
+      console.log(
+        `dry run: ${JSON.stringify({ pidgeToken, githubToken, note })}`
+      );
       res.status(200).json({ pidgeToken, githubToken, note });
       return;
     }
