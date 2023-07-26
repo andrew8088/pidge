@@ -12,12 +12,17 @@ module.exports = async function handler(
   res: VercelResponse
 ) {
   try {
-    const { pidgeToken, githubToken, note } = req.body;
+    const { pidgeToken, githubToken, note, dryRun } = req.body;
 
     invariant(pidgeToken, "body must include `pidgeToken`");
     invariant(pidgeToken === PIDGE_TOKEN, "incorrect pidgeToken provided");
     invariant(githubToken, "body must include `githubToken`");
     invariant(note && note.text, "body must include `note.text`");
+
+    if (dryRun && dryRun === "true") {
+      res.status(200).json({ pidgeToken, githubToken, note });
+      return;
+    }
 
     const octokit = new Octokit({ auth: githubToken });
 
