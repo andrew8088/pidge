@@ -1,0 +1,11 @@
+{
+  "name": "pidge",
+  "version": "0.1.0",
+  "dependencies": {
+    "@types/node": "20.4.5",
+    "@vercel/node": "^2.15.6",
+    "eslint": "8.45.0",
+    "eslint-config-next": "13.4.12",
+    "typescript": "5.1.6"
+  }
+}
