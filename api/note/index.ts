@@ -18,6 +18,8 @@ module.exports = async function handler(
     invariant(githubToken, "body must include `githubToken`");
     invariant(note && note.text, "body must include `note.text`");
 
+    note.name = note.name ?? getDatedNoteName();
+
     if (dryRun && (dryRun === "true" || dryRun === true)) {
       console.log(
         `dry run: ${JSON.stringify({ pidgeToken, githubToken, note })}`
@@ -25,18 +27,18 @@ module.exports = async function handler(
       console.log("--------TEXT-----------");
       console.log(note.text);
       console.log("-----------------------");
-      res.status(200).json({ pidgeToken, githubToken, note });
+      res
+        .status(200)
+        .json({ pidgeToken, githubToken, note, content: formatContent(note) });
       return;
     }
 
     const octokit = new Octokit({ auth: githubToken });
 
-    const noteName = note.name ?? getDatedNoteName();
-
     const data = await commitNote(
       octokit,
-      `content/notes/${noteName}`,
-      note.text
+      `content/notes/${note.name}`,
+      formatContent(note)
     );
 
     res.status(200).json({ commit: data, note });
@@ -49,6 +51,10 @@ module.exports = async function handler(
     res.status(400).json({ errorMessage });
   }
 };
+
+function formatContent(note: { text: string; tags?: string[] }) {
+  return note.text;
+}
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
