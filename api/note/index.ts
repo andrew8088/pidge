@@ -53,6 +53,12 @@ module.exports = async function handler(
 };
 
 function formatContent(note: { text: string; tags?: string[] }) {
+  if (note.tags && note.tags.length > 0) {
+    return `---
+tags: ${JSON.stringify(note.tags)}
+---
+${note.text}`;
+  }
   return note.text;
 }
 
