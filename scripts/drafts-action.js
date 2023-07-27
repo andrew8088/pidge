@@ -31,6 +31,7 @@ if (isPublished) {
 
   if (response.statusCode != 200 && response.statusCode != 202) {
     console.log("Request failed. Status code: " + response.statusCode);
+    console.log(JSON.stringify(response));
     context.fail();
   } else {
     const name = response.responseData.note.name;
