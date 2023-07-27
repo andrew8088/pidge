@@ -20,16 +20,18 @@ module.exports = async function handler(
 
     note.name = note.name ?? getDatedNoteName();
 
+    const noteContent = formatContent(note);
+
     if (dryRun && (dryRun === "true" || dryRun === true)) {
       console.log(
-        `dry run: ${JSON.stringify({ pidgeToken, githubToken, note })}`
+        `dry run: ${JSON.stringify({
+          pidgeToken,
+          githubToken,
+          note,
+          noteContent,
+        })}`
       );
-      console.log("--------TEXT-----------");
-      console.log(note.text);
-      console.log("-----------------------");
-      res
-        .status(200)
-        .json({ pidgeToken, githubToken, note, content: formatContent(note) });
+      res.status(200).json({ pidgeToken, githubToken, note, noteContent });
       return;
     }
 
@@ -38,10 +40,10 @@ module.exports = async function handler(
     const data = await commitNote(
       octokit,
       `content/notes/${note.name}`,
-      formatContent(note)
+      noteContent
     );
 
-    res.status(200).json({ commit: data, note });
+    res.status(200).json({ commit: data, note, noteContent });
   } catch (error) {
     console.log(error);
     const errorMessage =
