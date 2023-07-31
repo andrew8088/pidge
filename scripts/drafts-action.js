@@ -8,9 +8,12 @@ const pidgeToken = credential.getValue("pidgetoken").toString().trim();
 const githubToken = credential.getValue("githubtoken").toString().trim();
 const pidgeEndpoint = "https://pidge.vercel.app/api/note";
 
+const hasMicroTag = draft.tags.some((t) => t === "micro");
 const isPublished = draft.tags.some((t) => t === "published");
 
-if (isPublished) {
+if (!hasMicroTag) {
+  context.fail("note must have micro tag");
+} else if (isPublished) {
   context.fail("note already published");
 } else {
   const obj = {
