@@ -14,6 +14,7 @@ const region = process.env.AWS_REGION;
 const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 const bucket = process.env.AWS_S3_BUCKET_NAME;
+const pidgeSecret = process.env.PIDGE_TOKEN;
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,7 +24,13 @@ export default async function handler(
     res.setHeader("Allow", ["POST"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-  const { image, filename } = req.body;
+  const { image, filename, secret } = req.body;
+
+  if (secret !== pidgeSecret) {
+    return res
+      .status(400)
+      .json({ status: "failure", error: "secret incorrect" });
+  }
 
   if (!image || !filename) {
     return res
