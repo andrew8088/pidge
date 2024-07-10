@@ -2,7 +2,9 @@
   "name": "pidge",
   "version": "0.1.0",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.613.0",
     "@octokit/rest": "^20.0.1",
+    "@types/next": "^9.0.0",
     "@types/node": "20.4.5",
     "@vercel/node": "^2.15.6",
     "eslint": "8.45.0",
