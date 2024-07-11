@@ -46,17 +46,6 @@ export default async function handler(
       .status(500)
       .json({ status: "failure", error: "missing environment variables" });
   }
-  let parsedMetadata = {};
-  if (metadata) {
-    try {
-      parsedMetadata = JSON.parse(metadata);
-    } catch (error) {
-      return res.status(400).json({
-        status: "failure",
-        error: "Invalid metadata format. Should be a JSON object.",
-      });
-    }
-  }
 
   const s3 = new S3Client({
     region,
@@ -71,7 +60,9 @@ export default async function handler(
       Bucket: bucket,
       Key: fileName,
       ContentType: fileType,
-      Metadata: metadata,
+      Metadata: metadata ?? {
+        mimetype: fileType,
+      },
     });
 
     const uploadURL = await getSignedUrl(s3, command, { expiresIn: 120 });
