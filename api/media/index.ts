@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Buffer } from "buffer";
+import { fileTypeFromBuffer } from "file-type";
+import { imageDimensionsFromData } from "image-dimensions";
 
 type Data =
   | { status: "failure"; error: string; details?: string }
@@ -24,7 +26,7 @@ export default async function handler(
     res.setHeader("Allow", ["POST"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-  const { image, filename, secret } = req.body;
+  const { file, filename, description, secret } = req.body;
 
   if (secret !== pidgeSecret) {
     return res
@@ -32,7 +34,7 @@ export default async function handler(
       .json({ status: "failure", error: "secret incorrect" });
   }
 
-  if (!image || !filename) {
+  if (!file || !filename) {
     return res
       .status(400)
       .json({ status: "failure", error: "Image and filename are required" });
@@ -52,16 +54,36 @@ export default async function handler(
     },
   });
 
-  const params = {
-    Bucket: bucket,
-    Key: filename,
-    Body: Buffer.from(image, "base64"),
-    ContentEncoding: "base64",
-    ContentType: "image/jpeg",
-  };
+  const buffer = Buffer.from(file, "base64");
+  const metadata: Record<string, string> = {};
+
+  if (description) {
+    metadata.description = description;
+  }
+
+  const fileTypeResult = await fileTypeFromBuffer(buffer);
+
+  if (fileTypeResult) {
+    metadata.extension = fileTypeResult.ext;
+    metadata.mimetype = fileTypeResult.mime;
+  }
+
+  const dimensions = imageDimensionsFromData(buffer);
+
+  if (dimensions) {
+    metadata.width = String(dimensions.width);
+    metadata.height = String(dimensions.height);
+  }
 
   try {
-    const command = new PutObjectCommand(params);
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: filename,
+      Body: buffer,
+      ContentEncoding: "base64",
+      ContentType: fileTypeResult?.mime,
+      Metadata: metadata,
+    });
     const data = await s3.send(command);
     res.status(200).json({
       status: "success",
