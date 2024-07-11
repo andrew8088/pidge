@@ -2,8 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "lib": ["esnext"],
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "esnext",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
