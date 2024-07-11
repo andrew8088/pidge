@@ -1,7 +1,16 @@
+import type { NextApiRequest, NextApiResponse } from "next";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Buffer } from "buffer";
 import { fileTypeFromBuffer } from "file-type";
 import { imageDimensionsFromData } from "image-dimensions";
+
+type Data =
+  | { status: "failure"; error: string; details?: string }
+  | {
+      status: "success";
+      data: unknown;
+      url: string;
+    };
 
 const region = process.env.AWS_REGION;
 const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
@@ -9,7 +18,10 @@ const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 const bucket = process.env.AWS_S3_BUCKET_NAME;
 const pidgeSecret = process.env.PIDGE_TOKEN;
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
@@ -43,7 +55,7 @@ export default async function handler(req, res) {
   });
 
   const buffer = Buffer.from(file, "base64");
-  const metadata = {};
+  const metadata: Record<string, string> = {};
 
   if (description) {
     metadata.description = description;
@@ -82,7 +94,7 @@ export default async function handler(req, res) {
     res.status(500).json({
       status: "failure",
       error: "Error uploading image",
-      details: error.message,
+      details: (error as Error).message,
     });
   }
 }
