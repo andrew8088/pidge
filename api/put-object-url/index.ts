@@ -24,6 +24,9 @@ export default async function handler(
     res.setHeader("Allow", ["POST"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
+
+  console.log(req.body);
+
   const { fileType, fileName, metadata, secret } = req.body;
 
   if (secret !== pidgeSecret) {
